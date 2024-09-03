@@ -39,6 +39,9 @@ alloy-rlp = { workspace = true, optional = true }
 # serde
 serde = { workspace = true, optional = true, features = ["derive"] }
 
+# rkyv
+rkyv = { workspace = true, optional = true, features = ["validation"] }
+
 # getrandom
 getrandom = { workspace = true, optional = true }
 
@@ -87,6 +90,7 @@ asm-keccak = ["dep:keccak-asm"]
 postgres = ["std", "dep:postgres-types", "ruint/postgres"]
 getrandom = ["dep:getrandom"]
 rand = ["dep:rand", "getrandom", "ruint/rand"]
+rkyv = ["dep:rkyv", "ruint/rkyv"]
 rlp = ["dep:alloy-rlp", "ruint/alloy-rlp"]
 serde = ["dep:serde", "bytes/serde", "hex/serde", "ruint/serde"]
 arbitrary = [
