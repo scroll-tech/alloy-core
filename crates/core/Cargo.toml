@@ -49,6 +49,7 @@ asm-keccak = ["alloy-primitives/asm-keccak"]
 postgres = ["std", "alloy-primitives/postgres"]
 getrandom = ["alloy-primitives/getrandom"]
 rand = ["alloy-primitives/rand"]
+rkyv = ["alloy-primitives/rkyv"]
 rlp = ["alloy-primitives/rlp", "dep:alloy-rlp"]
 serde = ["alloy-primitives/serde"]
 arbitrary = [
