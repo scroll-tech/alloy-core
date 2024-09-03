@@ -50,6 +50,9 @@ syn-solidity = { version = "1.2.0", path = "crates/syn-solidity", default-featur
 serde = { version = "1.0", default-features = false, features = ["alloc"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 
+# rkyv
+rkyv = "0.8"
+
 # macros
 proc-macro-error2 = ">=2.0.0, <=2.0.1" # We directly use the `entry_point` private API.
 proc-macro2 = "1.0"
@@ -101,3 +104,6 @@ rayon = { version = "1.2", default-features = false }
 ruint = { version = "1.14.0", default-features = false, features = ["alloc"] }
 ruint-macro = { version = "1", default-features = false }
 winnow = { version = "0.7", default-features = false, features = ["alloc"] }
+
+[patch.crates-io]
+ruint = { git = "https://github.com/scroll-tech/uint.git", branch = "v1.15.0" }
