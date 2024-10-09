@@ -29,8 +29,9 @@ use hex::FromHex;
 )]
 #[cfg_attr(feature = "arbitrary", derive(derive_arbitrary::Arbitrary, proptest_derive::Arbitrary))]
 #[cfg_attr(feature = "allocative", derive(allocative::Allocative))]
-#[cfg_attr(target_pointer_width = "32", repr(align(4)))]
-#[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
+#[cfg_attr(target_pointer_width = "32", repr(C, align(4)))]
+#[cfg_attr(target_pointer_width = "64", repr(C, align(8)))]
 pub struct FixedBytes<const N: usize>(#[into_iterator(owned, ref, ref_mut)] pub [u8; N]);
 
 crate::impl_fb_traits!(FixedBytes<N>, N, const);

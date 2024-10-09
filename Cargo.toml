@@ -55,7 +55,7 @@ serde = { version = "1.0", default-features = false, features = ["alloc"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 
 # rkyv
-rkyv = { version = "0.7", features = ["validation"] }
+rkyv = "0.8"
 
 # macros
 proc-macro-error = "1.0"
