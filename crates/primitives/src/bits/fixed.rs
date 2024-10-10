@@ -71,7 +71,8 @@ impl<const N: usize> TryFrom<&[u8]> for FixedBytes<N> {
 
     #[inline]
     fn try_from(slice: &[u8]) -> Result<Self, Self::Error> {
-        <&Self>::try_from(slice).copied()
+        let slice = <&[u8; N]>::try_from(slice)?;
+        Ok(Self(*slice))
     }
 }
 
@@ -83,30 +84,6 @@ impl<const N: usize> TryFrom<&mut [u8]> for FixedBytes<N> {
     #[inline]
     fn try_from(slice: &mut [u8]) -> Result<Self, Self::Error> {
         Self::try_from(&*slice)
-    }
-}
-
-/// Tries to create a ref `FixedBytes<N>` by copying from a slice `&[u8]`.
-/// Succeeds if `slice.len() == N`.
-impl<'a, const N: usize> TryFrom<&'a [u8]> for &'a FixedBytes<N> {
-    type Error = core::array::TryFromSliceError;
-
-    #[inline]
-    fn try_from(slice: &'a [u8]) -> Result<&'a FixedBytes<N>, Self::Error> {
-        // SAFETY: `FixedBytes<N>` is `repr(transparent)` for `[u8; N]`
-        <&[u8; N]>::try_from(slice).map(|array_ref| unsafe { core::mem::transmute(array_ref) })
-    }
-}
-
-/// Tries to create a ref `FixedBytes<N>` by copying from a mutable slice `&mut
-/// [u8]`. Succeeds if `slice.len() == N`.
-impl<'a, const N: usize> TryFrom<&'a mut [u8]> for &'a mut FixedBytes<N> {
-    type Error = core::array::TryFromSliceError;
-
-    #[inline]
-    fn try_from(slice: &'a mut [u8]) -> Result<&'a mut FixedBytes<N>, Self::Error> {
-        // SAFETY: `FixedBytes<N>` is `repr(transparent)` for `[u8; N]`
-        <&mut [u8; N]>::try_from(slice).map(|array_ref| unsafe { core::mem::transmute(array_ref) })
     }
 }
 
