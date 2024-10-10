@@ -182,13 +182,13 @@ impl<'de> Decoder<'de> {
     /// Peek a word from the buffer at a specific offset, without advancing the
     /// offset.
     #[inline]
-    pub fn peek_word_at(&self, offset: usize) -> Result<&'de Word, Error> {
-        self.peek_len_at(offset, Word::len_bytes()).map(|w| <&Word>::try_from(w).unwrap())
+    pub fn peek_word_at(&self, offset: usize) -> Result<Word, Error> {
+        self.peek_len_at(offset, Word::len_bytes()).map(|w| <Word>::try_from(w).unwrap())
     }
 
     /// Peek the next word from the buffer without advancing the offset.
     #[inline]
-    pub fn peek_word(&self) -> Result<&'de Word, Error> {
+    pub fn peek_word(&self) -> Result<Word, Error> {
         self.peek_word_at(self.offset)
     }
 
@@ -196,18 +196,18 @@ impl<'de> Decoder<'de> {
     /// the offset.
     #[inline]
     pub fn peek_offset_at(&self, offset: usize) -> Result<usize> {
-        self.peek_word_at(offset).and_then(|word| utils::as_offset(word, self.validate))
+        self.peek_word_at(offset).and_then(|word| utils::as_offset(&word, self.validate))
     }
 
     /// Peek a `usize` from the buffer, without advancing the offset.
     #[inline]
     pub fn peek_offset(&self) -> Result<usize> {
-        self.peek_word().and_then(|word| utils::as_offset(word, self.validate))
+        self.peek_word().and_then(|word| utils::as_offset(&word, self.validate))
     }
 
     /// Take a word from the buffer, advancing the offset.
     #[inline]
-    pub fn take_word(&mut self) -> Result<&'de Word, Error> {
+    pub fn take_word(&mut self) -> Result<Word, Error> {
         let contents = self.peek_word()?;
         self.increase_offset(Word::len_bytes());
         Ok(contents)
@@ -223,7 +223,7 @@ impl<'de> Decoder<'de> {
     /// Takes a `usize` offset from the buffer by consuming a word.
     #[inline]
     pub fn take_offset(&mut self) -> Result<usize> {
-        self.take_word().and_then(|word| utils::as_offset(word, self.validate))
+        self.take_word().and_then(|word| utils::as_offset(&word, self.validate))
     }
 
     /// Takes a slice of bytes of the given length by consuming up to the next
@@ -244,9 +244,8 @@ impl<'de> Decoder<'de> {
     /// Takes a slice of bytes of the given length.
     #[inline]
     pub fn take_slice_unchecked(&mut self, len: usize) -> Result<&'de [u8]> {
-        self.peek_len(len).map(|x| {
+        self.peek_len(len).inspect(|_| {
             self.increase_offset(len);
-            x
         })
     }
 

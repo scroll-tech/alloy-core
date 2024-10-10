@@ -99,6 +99,7 @@ unsafe fn transpose<T, const N: usize>(array: [MaybeUninit<T>; N]) -> MaybeUnini
 }
 
 /// [`Vec::into_flattened`].
+#[allow(unused)]
 #[inline]
 pub(crate) fn into_flattened<T, const N: usize>(vec: Vec<[T; N]>) -> Vec<T> {
     let (ptr, len, cap) = into_raw_parts(vec);
@@ -122,6 +123,7 @@ pub(crate) fn into_flattened<T, const N: usize>(vec: Vec<[T; N]>) -> Vec<T> {
 }
 
 /// [`Vec::into_raw_parts`]
+#[allow(unused)]
 #[inline(always)]
 fn into_raw_parts<T>(vec: Vec<T>) -> (*mut T, usize, usize) {
     let mut me = mem::ManuallyDrop::new(vec);

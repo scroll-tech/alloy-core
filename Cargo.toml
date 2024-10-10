@@ -5,7 +5,7 @@ resolver = "2"
 [workspace.package]
 version = "0.8.0"
 edition = "2021"
-rust-version = "1.65"
+rust-version = "1.77"
 authors = ["Alloy Contributors"]
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/alloy-rs/core"
@@ -55,7 +55,7 @@ serde = { version = "1.0", default-features = false, features = ["alloc"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 
 # rkyv
-rkyv = { version = "0.7", features = ["validation"] }
+rkyv = "0.8"
 
 # macros
 proc-macro-error = "1.0"

@@ -187,7 +187,7 @@ impl<'a> Token<'a> for WordToken {
 
     #[inline]
     fn decode_from(dec: &mut Decoder<'a>) -> Result<Self> {
-        dec.take_word().copied().map(Self)
+        dec.take_word().map(Self)
     }
 
     #[inline]

@@ -40,7 +40,7 @@ alloy-rlp = { workspace = true, optional = true }
 serde = { workspace = true, optional = true, features = ["derive"] }
 
 # rkyv
-rkyv = { workspace = true, optional = true, features = ["validation"] }
+rkyv = { workspace = true, optional = true }
 
 # getrandom
 getrandom = { workspace = true, optional = true }

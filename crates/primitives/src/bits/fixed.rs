@@ -29,8 +29,9 @@ use hex::FromHex;
 )]
 #[cfg_attr(feature = "arbitrary", derive(derive_arbitrary::Arbitrary, proptest_derive::Arbitrary))]
 #[cfg_attr(feature = "allocative", derive(allocative::Allocative))]
-#[cfg_attr(target_pointer_width = "32", repr(align(4)))]
-#[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
+#[cfg_attr(target_pointer_width = "32", repr(C, align(4)))]
+#[cfg_attr(target_pointer_width = "64", repr(C, align(8)))]
 pub struct FixedBytes<const N: usize>(#[into_iterator(owned, ref, ref_mut)] pub [u8; N]);
 
 crate::impl_fb_traits!(FixedBytes<N>, N, const);
@@ -70,7 +71,8 @@ impl<const N: usize> TryFrom<&[u8]> for FixedBytes<N> {
 
     #[inline]
     fn try_from(slice: &[u8]) -> Result<Self, Self::Error> {
-        <&Self>::try_from(slice).copied()
+        let slice = <&[u8; N]>::try_from(slice)?;
+        Ok(Self(*slice))
     }
 }
 
@@ -82,30 +84,6 @@ impl<const N: usize> TryFrom<&mut [u8]> for FixedBytes<N> {
     #[inline]
     fn try_from(slice: &mut [u8]) -> Result<Self, Self::Error> {
         Self::try_from(&*slice)
-    }
-}
-
-/// Tries to create a ref `FixedBytes<N>` by copying from a slice `&[u8]`.
-/// Succeeds if `slice.len() == N`.
-impl<'a, const N: usize> TryFrom<&'a [u8]> for &'a FixedBytes<N> {
-    type Error = core::array::TryFromSliceError;
-
-    #[inline]
-    fn try_from(slice: &'a [u8]) -> Result<&'a FixedBytes<N>, Self::Error> {
-        // SAFETY: `FixedBytes<N>` is `repr(transparent)` for `[u8; N]`
-        <&[u8; N]>::try_from(slice).map(|array_ref| unsafe { core::mem::transmute(array_ref) })
-    }
-}
-
-/// Tries to create a ref `FixedBytes<N>` by copying from a mutable slice `&mut
-/// [u8]`. Succeeds if `slice.len() == N`.
-impl<'a, const N: usize> TryFrom<&'a mut [u8]> for &'a mut FixedBytes<N> {
-    type Error = core::array::TryFromSliceError;
-
-    #[inline]
-    fn try_from(slice: &'a mut [u8]) -> Result<&'a mut FixedBytes<N>, Self::Error> {
-        // SAFETY: `FixedBytes<N>` is `repr(transparent)` for `[u8; N]`
-        <&mut [u8; N]>::try_from(slice).map(|array_ref| unsafe { core::mem::transmute(array_ref) })
     }
 }
 

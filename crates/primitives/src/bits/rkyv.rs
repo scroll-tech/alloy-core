@@ -1,69 +1,61 @@
-use crate::{Address, FixedBytes};
-use rkyv::{Archive, Archived, CheckBytes, Deserialize, Fallible, Serialize};
-use std::convert::Infallible;
+use core::fmt::{Debug, Formatter};
+use std::hash::Hash;
+use super::*;
 
-impl Archive for Address {
-    type Archived = Address;
-    type Resolver = <[u8; 20] as Archive>::Resolver;
-
-    #[inline]
-    unsafe fn resolve(&self, pos: usize, resolver: Self::Resolver, out: *mut Self::Archived) {
-        self.0.0.resolve(pos, resolver, out as *mut [u8; 20]);
+impl From<&ArchivedAddress> for Address {
+    fn from(archived: &ArchivedAddress) -> Self {
+        Address::from(archived.0.0)
     }
 }
 
-impl<C: ?Sized> CheckBytes<C> for Address {
-    type Error = Infallible;
-    unsafe fn check_bytes<'a>(value: *const Self, _: &mut C) -> Result<&'a Self, Self::Error> {
-        Ok(&*value)
+impl From<ArchivedAddress> for Address {
+    fn from(archived: ArchivedAddress) -> Self {
+        Address::from(archived.0.0)
     }
 }
 
-impl<S: Fallible + ?Sized> Serialize<S> for Address {
-    #[inline]
-    fn serialize(&self, serializer: &mut S) -> Result<Self::Resolver, S::Error> {
-        Serialize::<S>::serialize(&self.0, serializer)
+impl Debug for ArchivedAddress {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        Debug::fmt(&Address::from(self.0.0), f)
     }
 }
 
-impl<D: Fallible + ?Sized> Deserialize<Address, D> for Archived<Address>
-{
-    #[inline]
-    fn deserialize(&self, _deserializer: &mut D) -> Result<Address, D::Error> {
-        Ok(*self)
+impl<const N: usize> From<&ArchivedFixedBytes<N>> for FixedBytes<N> {
+    fn from(archived: &ArchivedFixedBytes<N>) -> Self {
+        FixedBytes(archived.0)
     }
 }
 
-
-impl<const N: usize> Archive for FixedBytes<N> {
-    type Archived = FixedBytes<N>;
-    type Resolver = <[u8; N] as Archive>::Resolver;
-
-    #[inline]
-    unsafe fn resolve(&self, pos: usize, resolver: Self::Resolver, out: *mut Self::Archived) {
-        self.0.resolve(pos, resolver, out as *mut [u8; N]);
+impl<const N: usize> From<ArchivedFixedBytes<N>> for FixedBytes<N> {
+    fn from(archived: ArchivedFixedBytes<N>) -> Self {
+        FixedBytes(archived.0)
     }
 }
 
-impl<C: ?Sized, const N: usize> CheckBytes<C> for FixedBytes<N> {
-    type Error = Infallible;
-    unsafe fn check_bytes<'a>(value: *const Self, _: &mut C) -> Result<&'a Self, Self::Error> {
-        Ok(&*value)
+impl<const N: usize> Debug for ArchivedFixedBytes<N> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        Debug::fmt(&FixedBytes(self.0), f)
     }
 }
 
-impl<S: Fallible + ?Sized, const N: usize> Serialize<S> for FixedBytes<N> {
-    #[inline]
-    fn serialize(&self, serializer: &mut S) -> Result<Self::Resolver, S::Error> {
-        Serialize::<S>::serialize(&self.0, serializer)
+impl<const N: usize> Copy for ArchivedFixedBytes<N> {}
+
+impl<const N: usize> Clone for ArchivedFixedBytes<N> {
+    fn clone(&self) -> Self {
+        ArchivedFixedBytes(self.0)
     }
 }
 
-impl<D: Fallible + ?Sized, const N: usize> Deserialize<FixedBytes<N>, D>
-    for Archived<FixedBytes<N>>
-{
-    #[inline]
-    fn deserialize(&self, _deserializer: &mut D) -> Result<FixedBytes<N>, D::Error> {
-        Ok(*self)
+impl<const N: usize> PartialEq for ArchivedFixedBytes<N> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
+impl<const N: usize> Eq for ArchivedFixedBytes<N> {}
+
+impl<const N: usize> Hash for ArchivedFixedBytes<N> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.0.hash(state)
     }
 }
