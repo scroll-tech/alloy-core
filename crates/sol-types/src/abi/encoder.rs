@@ -12,7 +12,7 @@ use crate::{
     utils, Word,
 };
 use alloc::vec::Vec;
-use core::{mem, ptr};
+use core::ptr;
 
 /// An ABI encoder.
 ///
@@ -59,10 +59,14 @@ impl Encoder {
         // TODO: remove once `Vec::into_flattened` is stabilized.
         // unsafe { mem::transmute::<Vec<_>, Vec<[u8; 32]>>(self.buf) }.into_flattened()
 
-        // SAFETY: `#[repr(transparent)] FixedBytes<N>([u8; N])`
-        crate::impl_core::into_flattened::<u8, 32>(unsafe {
-            mem::transmute::<Vec<Word>, Vec<[u8; 32]>>(self.buf)
-        })
+        // BREAKED!! // SAFETY: `#[repr(transparent)] FixedBytes<N>([u8; N])`
+        // crate::impl_core::into_flattened::<u8, 32>(unsafe {
+        //     mem::transmute::<Vec<Word>, Vec<[u8; 32]>>(self.buf)
+        // })
+        self.buf
+            .into_iter()
+            .flat_map(|w| w.0)
+            .collect()
     }
 
     /// Determine the current suffix offset.

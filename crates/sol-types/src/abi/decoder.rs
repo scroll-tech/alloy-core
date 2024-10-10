@@ -244,9 +244,8 @@ impl<'de> Decoder<'de> {
     /// Takes a slice of bytes of the given length.
     #[inline]
     pub fn take_slice_unchecked(&mut self, len: usize) -> Result<&'de [u8]> {
-        self.peek_len(len).map(|x| {
+        self.peek_len(len).inspect(|_| {
             self.increase_offset(len);
-            x
         })
     }
 
