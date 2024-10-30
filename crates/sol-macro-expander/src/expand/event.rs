@@ -81,7 +81,7 @@ pub(super) fn expand(cx: &ExpCtxt<'_>, event: &ItemEvent) -> Result<TokenStream>
         let name = anon_name((i, p.name.as_ref()));
         let ty = expand_type(&p.ty, &cx.crates);
 
-        if p.indexed_as_hash() {
+        if cx.indexed_as_hash(p) {
             quote! {
                 <alloy_sol_types::sol_data::FixedBytes<32> as alloy_sol_types::EventTopic>::encode_topic(&self.#name)
             }
@@ -97,6 +97,18 @@ pub(super) fn expand(cx: &ExpCtxt<'_>, event: &ItemEvent) -> Result<TokenStream>
         .iter()
         .enumerate()
         .map(|(i, p)| expand_event_topic_field(i, p, p.name.as_ref(), cx));
+
+    let check_signature = (!anonymous).then(|| {
+        quote! {
+            #[inline]
+            fn check_signature(topics: &<Self::TopicList as alloy_sol_types::SolType>::RustType) -> alloy_sol_types::Result<()> {
+                if topics.0 != Self::SIGNATURE_HASH {
+                    return Err(alloy_sol_types::Error::invalid_event_signature_hash(Self::SIGNATURE, topics.0, Self::SIGNATURE_HASH));
+                }
+                Ok(())
+            }
+        }
+    });
 
     let tokenize_body_impl = expand_event_tokenize(&event.parameters, cx);
 
@@ -136,7 +148,7 @@ pub(super) fn expand(cx: &ExpCtxt<'_>, event: &ItemEvent) -> Result<TokenStream>
     let tokens = quote! {
         #(#attrs)*
         #doc
-        #[allow(non_camel_case_types, non_snake_case, clippy::style)]
+        #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields, clippy::style)]
         #[derive(Clone)]
         pub struct #name {
             #(
@@ -145,7 +157,7 @@ pub(super) fn expand(cx: &ExpCtxt<'_>, event: &ItemEvent) -> Result<TokenStream>
             )*
         }
 
-        #[allow(non_camel_case_types, non_snake_case, clippy::style)]
+        #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields, clippy::style)]
         const _: () = {
             use #alloy_sol_types as alloy_sol_types;
 
@@ -172,6 +184,8 @@ pub(super) fn expand(cx: &ExpCtxt<'_>, event: &ItemEvent) -> Result<TokenStream>
                         #(#new_impl,)*
                     }
                 }
+
+                #check_signature
 
                 #[inline]
                 fn tokenize_body(&self) -> Self::DataToken<'_> {
@@ -225,7 +239,7 @@ pub(super) fn expand(cx: &ExpCtxt<'_>, event: &ItemEvent) -> Result<TokenStream>
 fn expand_event_topic_type(param: &EventParameter, cx: &ExpCtxt<'_>) -> TokenStream {
     let alloy_sol_types = &cx.crates.sol_types;
     assert!(param.is_indexed());
-    if param.is_abi_dynamic() {
+    if cx.indexed_as_hash(param) {
         quote_spanned! {param.ty.span()=> #alloy_sol_types::sol_data::FixedBytes<32> }
     } else {
         expand_type(&param.ty, &cx.crates)
@@ -239,7 +253,7 @@ fn expand_event_topic_field(
     cx: &ExpCtxt<'_>,
 ) -> TokenStream {
     let name = anon_name((i, name));
-    let ty = if param.indexed_as_hash() {
+    let ty = if cx.indexed_as_hash(param) {
         let bytes32 = ast::Type::FixedBytes(name.span(), core::num::NonZeroU16::new(32).unwrap());
         ty::expand_rust_type(&bytes32, &cx.crates)
     } else {

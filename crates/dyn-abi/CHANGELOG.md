@@ -5,6 +5,95 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.10](https://github.com/alloy-rs/core/releases/tag/v0.8.10) - 2024-10-28
+
+### Bug Fixes
+
+- Revert MSRV changes ([#789](https://github.com/alloy-rs/core/issues/789))
+
+### Dependencies
+
+- Bump MSRV to 1.81 & use `core::error::Error` in place of `std` ([#780](https://github.com/alloy-rs/core/issues/780))
+
+## [0.8.9](https://github.com/alloy-rs/core/releases/tag/v0.8.9) - 2024-10-21
+
+### Miscellaneous Tasks
+
+- Release 0.8.9
+
+## [0.8.8](https://github.com/alloy-rs/core/releases/tag/v0.8.8) - 2024-10-14
+
+### Miscellaneous Tasks
+
+- Release 0.8.8
+
+## [0.8.7](https://github.com/alloy-rs/core/releases/tag/v0.8.7) - 2024-10-08
+
+### Miscellaneous Tasks
+
+- Release 0.8.7
+
+### Other
+
+- Revert "Add custom serialization for Address" ([#765](https://github.com/alloy-rs/core/issues/765))
+
+## [0.8.6](https://github.com/alloy-rs/core/releases/tag/v0.8.6) - 2024-10-06
+
+### Bug Fixes
+
+- Fix lint `alloy-dyn-abi` ([#758](https://github.com/alloy-rs/core/issues/758))
+
+### Miscellaneous Tasks
+
+- Release 0.8.6
+- Remove a stabilized impl_core function
+
+## [0.8.5](https://github.com/alloy-rs/core/releases/tag/v0.8.5) - 2024-09-25
+
+### Miscellaneous Tasks
+
+- Release 0.8.5
+
+## [0.8.4](https://github.com/alloy-rs/core/releases/tag/v0.8.4) - 2024-09-25
+
+### Features
+
+- [primitives] Implement `map` module ([#743](https://github.com/alloy-rs/core/issues/743))
+
+### Miscellaneous Tasks
+
+- Release 0.8.4
+
+### Other
+
+- Add custom serialization for Address ([#742](https://github.com/alloy-rs/core/issues/742))
+
+### Testing
+
+- Add another dyn-abi test
+
+## [0.8.3](https://github.com/alloy-rs/core/releases/tag/v0.8.3) - 2024-09-10
+
+### Miscellaneous Tasks
+
+- Release 0.8.3
+
+## [0.8.2](https://github.com/alloy-rs/core/releases/tag/v0.8.2) - 2024-09-06
+
+### Bug Fixes
+
+- `no_std` and workflow ([#727](https://github.com/alloy-rs/core/issues/727))
+
+### Miscellaneous Tasks
+
+- Release 0.8.2
+
+## [0.8.1](https://github.com/alloy-rs/core/releases/tag/v0.8.1) - 2024-09-06
+
+### Miscellaneous Tasks
+
+- Release 0.8.1
+
 ## [0.8.0](https://github.com/alloy-rs/core/releases/tag/v0.8.0) - 2024-08-21
 
 ### Bug Fixes
@@ -14,6 +103,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Features
 
 - [sol-macro] Support namespaces ([#694](https://github.com/alloy-rs/core/issues/694))
+
+### Miscellaneous Tasks
+
+- Release 0.8.0
 
 ### Other
 

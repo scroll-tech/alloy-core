@@ -5,11 +5,73 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.9](https://github.com/alloy-rs/core/releases/tag/v0.8.9) - 2024-10-21
+
+### Miscellaneous Tasks
+
+- Release 0.8.9
+
+## [0.8.8](https://github.com/alloy-rs/core/releases/tag/v0.8.8) - 2024-10-14
+
+### Miscellaneous Tasks
+
+- Release 0.8.8
+
+## [0.8.7](https://github.com/alloy-rs/core/releases/tag/v0.8.7) - 2024-10-08
+
+### Miscellaneous Tasks
+
+- Release 0.8.7
+
+## [0.8.6](https://github.com/alloy-rs/core/releases/tag/v0.8.6) - 2024-10-06
+
+### Miscellaneous Tasks
+
+- Release 0.8.6
+
+## [0.8.5](https://github.com/alloy-rs/core/releases/tag/v0.8.5) - 2024-09-25
+
+### Miscellaneous Tasks
+
+- Release 0.8.5
+
+## [0.8.4](https://github.com/alloy-rs/core/releases/tag/v0.8.4) - 2024-09-25
+
+### Bug Fixes
+
+- [json-abi] Normalize $ to _ in identifiers in to_sol ([#747](https://github.com/alloy-rs/core/issues/747))
+
+### Miscellaneous Tasks
+
+- Release 0.8.4
+
+## [0.8.3](https://github.com/alloy-rs/core/releases/tag/v0.8.3) - 2024-09-10
+
+### Miscellaneous Tasks
+
+- Release 0.8.3
+
+## [0.8.2](https://github.com/alloy-rs/core/releases/tag/v0.8.2) - 2024-09-06
+
+### Miscellaneous Tasks
+
+- Release 0.8.2
+
+## [0.8.1](https://github.com/alloy-rs/core/releases/tag/v0.8.1) - 2024-09-06
+
+### Miscellaneous Tasks
+
+- Release 0.8.1
+
 ## [0.8.0](https://github.com/alloy-rs/core/releases/tag/v0.8.0) - 2024-08-21
 
 ### Features
 
 - [sol-macro] Support namespaces ([#694](https://github.com/alloy-rs/core/issues/694))
+
+### Miscellaneous Tasks
+
+- Release 0.8.0
 
 ## [0.7.7](https://github.com/alloy-rs/core/releases/tag/v0.7.7) - 2024-07-08
 

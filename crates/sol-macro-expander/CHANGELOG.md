@@ -5,11 +5,92 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.9](https://github.com/alloy-rs/core/releases/tag/v0.8.9) - 2024-10-21
+
+### Miscellaneous Tasks
+
+- Release 0.8.9
+
+## [0.8.8](https://github.com/alloy-rs/core/releases/tag/v0.8.8) - 2024-10-14
+
+### Bug Fixes
+
+- [alloy-sol-macro] Allow clippy::pub_underscore_fields on `sol!` output ([#770](https://github.com/alloy-rs/core/issues/770))
+
+### Miscellaneous Tasks
+
+- Release 0.8.8
+
+## [0.8.7](https://github.com/alloy-rs/core/releases/tag/v0.8.7) - 2024-10-08
+
+### Miscellaneous Tasks
+
+- Release 0.8.7
+
+## [0.8.6](https://github.com/alloy-rs/core/releases/tag/v0.8.6) - 2024-10-06
+
+### Bug Fixes
+
+- Fix lint `alloy-sol-macro-expander` ([#760](https://github.com/alloy-rs/core/issues/760))
+
+### Miscellaneous Tasks
+
+- Release 0.8.6
+
+## [0.8.5](https://github.com/alloy-rs/core/releases/tag/v0.8.5) - 2024-09-25
+
+### Miscellaneous Tasks
+
+- Release 0.8.5
+
+## [0.8.4](https://github.com/alloy-rs/core/releases/tag/v0.8.4) - 2024-09-25
+
+### Bug Fixes
+
+- [sol-types] Check signature in SolEvent if non-anonymous ([#741](https://github.com/alloy-rs/core/issues/741))
+
+### Miscellaneous Tasks
+
+- Release 0.8.4
+
+## [0.8.3](https://github.com/alloy-rs/core/releases/tag/v0.8.3) - 2024-09-10
+
+### Bug Fixes
+
+- [sol-macro] Correctly determine whether event parameters are hashes ([#735](https://github.com/alloy-rs/core/issues/735))
+- [sol-macro] Namespaced custom type resolution ([#731](https://github.com/alloy-rs/core/issues/731))
+- Parse selector hashes in `sol` macro ([#730](https://github.com/alloy-rs/core/issues/730))
+
+### Miscellaneous Tasks
+
+- Release 0.8.3
+
+## [0.8.2](https://github.com/alloy-rs/core/releases/tag/v0.8.2) - 2024-09-06
+
+### Miscellaneous Tasks
+
+- Release 0.8.2
+
+## [0.8.1](https://github.com/alloy-rs/core/releases/tag/v0.8.1) - 2024-09-06
+
+### Dependencies
+
+- Bump MSRV to 1.79 ([#712](https://github.com/alloy-rs/core/issues/712))
+
+### Miscellaneous Tasks
+
+- Release 0.8.1
+- Use proc-macro-error2 ([#723](https://github.com/alloy-rs/core/issues/723))
+
 ## [0.8.0](https://github.com/alloy-rs/core/releases/tag/v0.8.0) - 2024-08-21
 
 ### Features
 
 - [sol-macro] Support namespaces ([#694](https://github.com/alloy-rs/core/issues/694))
+
+### Miscellaneous Tasks
+
+- Release 0.8.0
 
 ### Other
 

@@ -6,15 +6,17 @@ use crate::{
 };
 use alloy_sol_macro_input::{ContainsSolAttrs, SolAttrs};
 use ast::{
-    EventParameter, File, Item, ItemError, ItemEvent, ItemFunction, Parameters, SolIdent, SolPath,
-    Spanned, Type, VariableDeclaration, Visit,
+    visit_mut, EventParameter, File, Item, ItemError, ItemEvent, ItemFunction, Parameters,
+    SolIdent, SolPath, Spanned, Type, VariableDeclaration, Visit, VisitMut,
 };
 use indexmap::IndexMap;
 use proc_macro2::{Delimiter, Group, Ident, Punct, Spacing, Span, TokenStream, TokenTree};
-use proc_macro_error::{abort, emit_error};
+use proc_macro_error2::{abort, emit_error};
 use quote::{format_ident, quote, TokenStreamExt};
 use std::{
     borrow::Borrow,
+    collections::HashMap,
+    fmt,
     fmt::Write,
     sync::atomic::{AtomicBool, Ordering},
 };
@@ -157,7 +159,8 @@ impl<'ast> ExpCtxt<'ast> {
 
         if !self.all_items.0.is_empty() {
             self.resolve_custom_types();
-            if self.mk_overloads_map().is_err() {
+            // Selector collisions requires resolved types.
+            if self.mk_overloads_map().is_err() || self.check_selector_collisions().is_err() {
                 abort = true;
             }
         }
@@ -195,7 +198,7 @@ impl<'ast> ExpCtxt<'ast> {
 }
 
 // resolve
-impl<'ast> ExpCtxt<'ast> {
+impl ExpCtxt<'_> {
     fn parse_file_attributes(&mut self) -> Result<()> {
         let (attrs, others) = self.ast.split_attrs()?;
         self.attrs = attrs;
@@ -224,24 +227,44 @@ impl<'ast> ExpCtxt<'ast> {
     }
 
     fn resolve_custom_types(&mut self) {
+        /// Helper struct, recursively resolving types and keeping track of namespace which is
+        /// updated when entering a type from external contract.
+        struct Resolver<'a> {
+            map: &'a NamespacedMap<Type>,
+            cnt: usize,
+            namespace: Option<SolIdent>,
+        }
+        impl VisitMut<'_> for Resolver<'_> {
+            fn visit_type(&mut self, ty: &mut Type) {
+                if self.cnt >= RESOLVE_LIMIT {
+                    return;
+                }
+                let prev_namespace = self.namespace.clone();
+                if let Type::Custom(name) = ty {
+                    let Some(resolved) = self.map.resolve(name, &self.namespace) else {
+                        return;
+                    };
+                    // Update namespace if we're entering a new one
+                    if name.len() == 2 {
+                        self.namespace = Some(name.first().clone());
+                    }
+                    ty.clone_from(resolved);
+                    self.cnt += 1;
+                }
+
+                visit_mut::visit_type(self, ty);
+
+                self.namespace = prev_namespace;
+            }
+        }
+
         self.mk_types_map();
         let map = self.custom_types.clone();
         for (namespace, custom_types) in &mut self.custom_types.0 {
             for ty in custom_types.values_mut() {
-                let mut i = 0;
-                ty.visit_mut(|ty| {
-                    if i >= RESOLVE_LIMIT {
-                        return;
-                    }
-                    let ty @ Type::Custom(_) = ty else { return };
-                    let Type::Custom(name) = &*ty else { unreachable!() };
-                    let Some(resolved) = map.resolve(name, namespace) else {
-                        return;
-                    };
-                    ty.clone_from(resolved);
-                    i += 1;
-                });
-                if i >= RESOLVE_LIMIT {
+                let mut resolver = Resolver { map: &map, cnt: 0, namespace: namespace.clone() };
+                resolver.visit_type(ty);
+                if resolver.cnt >= RESOLVE_LIMIT {
                     abort!(
                         ty.span(),
                         "failed to resolve types.\n\
@@ -252,6 +275,82 @@ impl<'ast> ExpCtxt<'ast> {
                 }
             }
         }
+    }
+
+    /// Checks for function and error selector collisions in the resolved items.
+    fn check_selector_collisions(&mut self) -> std::result::Result<(), ()> {
+        #[derive(Clone, Copy)]
+        enum SelectorKind {
+            Function,
+            Error,
+            // We can ignore events since their selectors are 32 bytes which are unlikely to
+            // collide.
+            // Event,
+        }
+
+        impl fmt::Display for SelectorKind {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                match self {
+                    Self::Function => "function",
+                    Self::Error => "error",
+                    // Self::Event => "event",
+                }
+                .fmt(f)
+            }
+        }
+
+        let mut result = Ok(());
+
+        let mut selectors = vec![HashMap::new(); 3];
+        let all_items = std::mem::take(&mut self.all_items);
+        for (namespace, items) in &all_items.0 {
+            self.with_namespace(namespace.clone(), |this| {
+                selectors.iter_mut().for_each(|s| s.clear());
+                for (_, &item) in items {
+                    let (kind, selector) = match item {
+                        Item::Function(function) => {
+                            (SelectorKind::Function, this.function_selector(function))
+                        }
+                        Item::Error(error) => (SelectorKind::Error, this.error_selector(error)),
+                        // Item::Event(event) => (SelectorKind::Event, this.event_selector(event)),
+                        _ => continue,
+                    };
+                    let selector: [u8; 4] = selector.array.try_into().unwrap();
+                    // 0x00000000 or 0xffffffff are reserved for custom errors.
+                    if matches!(kind, SelectorKind::Error)
+                        && (selector == [0, 0, 0, 0] || selector == [0xff, 0xff, 0xff, 0xff])
+                    {
+                        emit_error!(
+                            item.span(),
+                            "{kind} selector `{}` is reserved",
+                            hex::encode_prefixed(selector),
+                        );
+                        result = Err(());
+                        continue;
+                    }
+                    match selectors[kind as usize].entry(selector) {
+                        std::collections::hash_map::Entry::Vacant(entry) => {
+                            entry.insert(item);
+                        }
+                        std::collections::hash_map::Entry::Occupied(entry) => {
+                            result = Err(());
+                            let other = *entry.get();
+                            emit_error!(
+                                item.span(),
+                                "{kind} selector `{}` collides with `{}`",
+                                hex::encode_prefixed(selector),
+                                other.name().unwrap();
+
+                                note = other.span() => "other declaration is here";
+                            );
+                        }
+                    }
+                }
+            })
+        }
+        self.all_items = all_items;
+
+        result
     }
 
     fn mk_overloads_map(&mut self) -> std::result::Result<(), ()> {
@@ -438,18 +537,6 @@ impl<'ast> ExpCtxt<'ast> {
         self.all_items.resolve(name, &self.current_namespace).copied()
     }
 
-    /// Recursively resolves the given type by constructing a new one.
-    #[allow(dead_code)]
-    fn make_resolved_type(&self, ty: &Type) -> Type {
-        let mut ty = ty.clone();
-        ty.visit_mut(|ty| {
-            if let Type::Custom(name) = ty {
-                *ty = self.custom_type(name).clone();
-            }
-        });
-        ty
-    }
-
     fn custom_type(&self, name: &SolPath) -> &Type {
         match self.try_custom_type(name) {
             Some(item) => item,
@@ -458,7 +545,23 @@ impl<'ast> ExpCtxt<'ast> {
     }
 
     fn try_custom_type(&self, name: &SolPath) -> Option<&Type> {
-        self.custom_types.resolve(name, &self.current_namespace)
+        self.custom_types.resolve(name, &self.current_namespace).inspect(|&ty| {
+            if ty.is_custom() {
+                abort!(
+                    ty.span(),
+                    "unresolved custom type in map";
+                    note = name.span() => "name span";
+                );
+            }
+        })
+    }
+
+    fn indexed_as_hash(&self, param: &EventParameter) -> bool {
+        param.indexed_as_hash(self.custom_is_value_type())
+    }
+
+    fn custom_is_value_type(&self) -> impl Fn(&SolPath) -> bool + '_ {
+        move |ty| self.custom_type(ty).is_value_type(self.custom_is_value_type())
     }
 
     /// Returns the name of the function, adjusted for overloads.

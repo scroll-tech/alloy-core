@@ -5,10 +5,10 @@ mod parity;
 pub use parity::Parity;
 
 mod sig;
-#[cfg(feature = "unstable-doc")]
 pub use sig::Signature;
-#[cfg(not(feature = "unstable-doc"))]
-pub(crate) use sig::Signature;
 
 mod utils;
-pub use utils::to_eip155_v;
+pub use utils::{normalize_v, to_eip155_v};
+
+mod primitive_sig;
+pub use primitive_sig::PrimitiveSignature;

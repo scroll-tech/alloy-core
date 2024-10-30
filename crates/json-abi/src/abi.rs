@@ -84,7 +84,7 @@ impl JsonAbi {
     ///     "function transferFrom(address from, address to, uint value)",
     ///     "function balanceOf(address owner)(uint balance)",
     ///     "event Transfer(address indexed from, address indexed to, address value)",
-    ///     "error InsufficientBalance(account owner, uint balance)",
+    ///     "error InsufficientBalance(address owner, uint balance)",
     ///     "function addPerson(tuple(string, uint16) person)",
     ///     "function addPeople(tuple(string, uint16)[] person)",
     ///     "function getPerson(uint id)(tuple(string, uint16))",
@@ -405,7 +405,7 @@ macro_rules! iter_impl {
 ///
 /// This `struct` is created by [`JsonAbi::items`]. See its documentation for
 /// more.
-#[derive(Clone, Debug)] // TODO(MSRV-1.70): derive Default
+#[derive(Clone, Debug, Default)]
 pub struct Items<'a> {
     len: usize,
     constructor: Option<&'a Constructor>,
@@ -428,7 +428,7 @@ iter_impl!(traits Items<'_>);
 ///
 /// This `struct` is created by [`JsonAbi::into_items`]. See its documentation
 /// for more.
-#[derive(Debug)] // TODO(MSRV-1.70): derive Default
+#[derive(Debug, Default)]
 pub struct IntoItems {
     len: usize,
     constructor: Option<Constructor>,

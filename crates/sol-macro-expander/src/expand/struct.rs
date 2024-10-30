@@ -64,13 +64,13 @@ pub(super) fn expand(cx: &ExpCtxt<'_>, s: &ItemStruct) -> Result<TokenStream> {
     let tokens = quote! {
         #(#attrs)*
         #doc
-        #[allow(non_camel_case_types, non_snake_case)]
+        #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
         #[derive(Clone)]
         pub struct #name {
             #(#fields),*
         }
 
-        #[allow(non_camel_case_types, non_snake_case, clippy::style)]
+        #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields, clippy::style)]
         const _: () = {
             use #alloy_sol_types as alloy_sol_types;
 
@@ -207,7 +207,7 @@ fn expand_encode_type_fns(
             Some(Item::Enum(_)) => *ty = Type::Uint(ty.span(), NonZeroU16::new(8)),
             Some(Item::Udt(udt)) => *ty = udt.ty.clone(),
             Some(item) => {
-                proc_macro_error::abort!(item.span(), "Invalid type in struct field: {:?}", item)
+                proc_macro_error2::abort!(item.span(), "Invalid type in struct field: {:?}", item)
             }
         }
     });

@@ -5,6 +5,163 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.10](https://github.com/alloy-rs/core/releases/tag/v0.8.10) - 2024-10-28
+
+### Bug Fixes
+
+- Revert MSRV changes ([#789](https://github.com/alloy-rs/core/issues/789))
+
+### Dependencies
+
+- Bump MSRV to 1.81 & use `core::error::Error` in place of `std` ([#780](https://github.com/alloy-rs/core/issues/780))
+
+### Other
+
+- Implement `DerefMut` for `Log<T>` ([#786](https://github.com/alloy-rs/core/issues/786))
+
+### Refactor
+
+- Use simple boolean for parity in signature ([#776](https://github.com/alloy-rs/core/issues/776))
+
+## [0.8.9](https://github.com/alloy-rs/core/releases/tag/v0.8.9) - 2024-10-21
+
+### Bug Fixes
+
+- Re-enable foldhash by default, but exclude it from zkvm ([#777](https://github.com/alloy-rs/core/issues/777))
+
+### Features
+
+- Expand Seal api ([#773](https://github.com/alloy-rs/core/issues/773))
+
+### Miscellaneous Tasks
+
+- Release 0.8.9
+
+## [0.8.8](https://github.com/alloy-rs/core/releases/tag/v0.8.8) - 2024-10-14
+
+### Bug Fixes
+
+- Properly account for sign in pg to/from sql implementation for signed ([#772](https://github.com/alloy-rs/core/issues/772))
+- Don't enable foldhash by default ([#771](https://github.com/alloy-rs/core/issues/771))
+
+### Features
+
+- Add logs_bloom ([#768](https://github.com/alloy-rs/core/issues/768))
+
+### Miscellaneous Tasks
+
+- Release 0.8.8
+
+## [0.8.7](https://github.com/alloy-rs/core/releases/tag/v0.8.7) - 2024-10-08
+
+### Miscellaneous Tasks
+
+- Release 0.8.7
+
+### Other
+
+- Revert "Add custom serialization for Address" ([#765](https://github.com/alloy-rs/core/issues/765))
+
+## [0.8.6](https://github.com/alloy-rs/core/releases/tag/v0.8.6) - 2024-10-06
+
+### Bug Fixes
+
+- Fix lint `alloy-primitives` ([#756](https://github.com/alloy-rs/core/issues/756))
+
+### Dependencies
+
+- [deps] Bump hashbrown to 0.15 ([#753](https://github.com/alloy-rs/core/issues/753))
+
+### Features
+
+- Add `Default` for `Sealed<T>` ([#755](https://github.com/alloy-rs/core/issues/755))
+- [primitives] Add and use foldhash as default hasher ([#763](https://github.com/alloy-rs/core/issues/763))
+
+### Miscellaneous Tasks
+
+- Release 0.8.6
+
+### Other
+
+- Derive `Arbitrary` for `Sealed<T>` ([#762](https://github.com/alloy-rs/core/issues/762))
+- Derive `Deref` for `Sealed<T>` ([#759](https://github.com/alloy-rs/core/issues/759))
+- Add conversion `TxKind` -> `Option<Address>` ([#750](https://github.com/alloy-rs/core/issues/750))
+
+## [0.8.5](https://github.com/alloy-rs/core/releases/tag/v0.8.5) - 2024-09-25
+
+### Bug Fixes
+
+- [primitives] Make sure DefaultHashBuilder implements Clone ([#748](https://github.com/alloy-rs/core/issues/748))
+
+### Miscellaneous Tasks
+
+- Release 0.8.5
+- [primitives] Remove Fx* aliases ([#749](https://github.com/alloy-rs/core/issues/749))
+
+## [0.8.4](https://github.com/alloy-rs/core/releases/tag/v0.8.4) - 2024-09-25
+
+### Features
+
+- [primitives] Implement `map` module ([#743](https://github.com/alloy-rs/core/issues/743))
+- Support Keccak with sha3 ([#737](https://github.com/alloy-rs/core/issues/737))
+
+### Miscellaneous Tasks
+
+- Release 0.8.4
+- Remove unused unstable-doc feature
+
+### Other
+
+- Add custom serialization for Address ([#742](https://github.com/alloy-rs/core/issues/742))
+
+## [0.8.3](https://github.com/alloy-rs/core/releases/tag/v0.8.3) - 2024-09-10
+
+### Features
+
+- Prepare reth Signature migration to alloy ([#732](https://github.com/alloy-rs/core/issues/732))
+
+### Miscellaneous Tasks
+
+- Release 0.8.3
+
+## [0.8.2](https://github.com/alloy-rs/core/releases/tag/v0.8.2) - 2024-09-06
+
+### Bug Fixes
+
+- `no_std` and workflow ([#727](https://github.com/alloy-rs/core/issues/727))
+
+### Documentation
+
+- [primitives] Document features in `wrap_fixed_bytes`-generated types ([#726](https://github.com/alloy-rs/core/issues/726))
+
+### Miscellaneous Tasks
+
+- Release 0.8.2
+
+## [0.8.1](https://github.com/alloy-rs/core/releases/tag/v0.8.1) - 2024-09-06
+
+### Bug Fixes
+
+- Use quantity for v value ([#715](https://github.com/alloy-rs/core/issues/715))
+
+### Dependencies
+
+- Bump MSRV to 1.79 ([#712](https://github.com/alloy-rs/core/issues/712))
+- Revert "chore(deps): bump derive_more to 1.0"
+- [deps] Bump derive_more to 1.0
+
+### Miscellaneous Tasks
+
+- Release 0.8.1
+
+### Performance
+
+- [primitives] Improve checksum algorithm ([#713](https://github.com/alloy-rs/core/issues/713))
+
+### Refactor
+
+- Remove `Signature` generic ([#719](https://github.com/alloy-rs/core/issues/719))
+
 ## [0.8.0](https://github.com/alloy-rs/core/releases/tag/v0.8.0) - 2024-08-21
 
 ### Bug Fixes
@@ -26,6 +183,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Miscellaneous Tasks
 
+- Release 0.8.0
 - [primitives] Re-use ruint mask function ([#698](https://github.com/alloy-rs/core/issues/698))
 - Derive hash for parity ([#686](https://github.com/alloy-rs/core/issues/686))
 
