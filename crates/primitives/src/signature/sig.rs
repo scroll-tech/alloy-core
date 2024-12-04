@@ -114,8 +114,7 @@ impl Signature {
     }
 
     /// Instantiate a new signature from `r`, `s`, and `v` values.
-    #[allow(clippy::missing_const_for_fn)]
-    pub fn new(r: U256, s: U256, v: Parity) -> Self {
+    pub const fn new(r: U256, s: U256, v: Parity) -> Self {
         Self { r, s, v }
     }
 
@@ -299,6 +298,25 @@ impl Signature {
     #[inline]
     pub const fn v(&self) -> Parity {
         self.v
+    }
+
+    /// Returns the chain ID associated with the V value, if this signature is
+    /// replay-protected by [EIP-155].
+    ///
+    /// [EIP-155]: https://eips.ethereum.org/EIPS/eip-155
+    pub const fn chain_id(&self) -> Option<u64> {
+        self.v.chain_id()
+    }
+
+    /// Returns true if the signature is replay-protected by [EIP-155].
+    ///
+    /// This is true if the V value is 35 or greater. Values less than 35 are
+    /// either not replay protected (27/28), or are invalid.
+    ///
+    /// [EIP-155]: https://eips.ethereum.org/EIPS/eip-155
+    #[inline]
+    pub const fn has_eip155_value(&self) -> bool {
+        self.v().has_eip155_value()
     }
 
     /// Returns the byte-array representation of this signature.

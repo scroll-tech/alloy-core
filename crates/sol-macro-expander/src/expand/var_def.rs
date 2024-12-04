@@ -19,8 +19,8 @@ pub(super) fn var_as_function(
     cx: &ExpCtxt<'_>,
     var_def: &VariableDefinition,
 ) -> Result<Option<ItemFunction>> {
-    // only expand public or external state variables
-    if !var_def.attributes.visibility().map_or(false, |v| v.is_public() || v.is_external()) {
+    // Only expand public or external state variables.
+    if !var_def.attributes.visibility().is_some_and(|v| v.is_public() || v.is_external()) {
         return Ok(None);
     }
 
@@ -43,12 +43,7 @@ fn expand_returns(cx: &ExpCtxt<'_>, f: &mut ItemFunction) -> Result<()> {
     if let Type::Custom(name) = ty {
         ty = cx.custom_type(name);
     }
-
-    // skip if not tuple with complex types
     let Type::Tuple(tup) = ty else { return Ok(()) };
-    if !tup.types.iter().any(type_is_complex) {
-        return Ok(());
-    }
 
     // retain only non-complex types
     // TODO: assign return types' names from the original struct
@@ -103,6 +98,8 @@ fn expand_returns(cx: &ExpCtxt<'_>, f: &mut ItemFunction) -> Result<()> {
 ///     }
 /// }
 /// ```
+///
+/// Ref: <https://github.com/ethereum/solidity/blob/9d7cc42bc1c12bb43e9dccf8c6c36833fdfcbbca/libsolidity/ast/Types.cpp#L2887-L2891>
 fn type_is_complex(ty: &Type) -> bool {
     matches!(ty, Type::Mapping(_) | Type::Array(_))
 }
