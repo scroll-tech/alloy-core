@@ -20,12 +20,6 @@ impl Debug for ArchivedAddress {
     }
 }
 
-impl<const N: usize> From<&ArchivedFixedBytes<N>> for FixedBytes<N> {
-    fn from(archived: &ArchivedFixedBytes<N>) -> Self {
-        FixedBytes(archived.0)
-    }
-}
-
 impl<const N: usize> From<ArchivedFixedBytes<N>> for FixedBytes<N> {
     fn from(archived: ArchivedFixedBytes<N>) -> Self {
         FixedBytes(archived.0)
