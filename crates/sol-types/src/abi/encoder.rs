@@ -797,7 +797,7 @@ mod tests {
         let data = vec![hex!(
             "019c80031b20d5e69c8093a571162299032018d913930d93ab320ae5ea44a4218a274f00d607"
         )
-        .to_vec()];
+            .to_vec()];
 
         let expected = hex!(
             "
