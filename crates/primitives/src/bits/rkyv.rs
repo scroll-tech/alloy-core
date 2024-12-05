@@ -2,12 +2,6 @@ use core::fmt::{Debug, Formatter};
 use std::hash::Hash;
 use super::*;
 
-impl From<&ArchivedAddress> for Address {
-    fn from(archived: &ArchivedAddress) -> Self {
-        Address::from(archived.0.0)
-    }
-}
-
 impl From<ArchivedAddress> for Address {
     fn from(archived: ArchivedAddress) -> Self {
         Address::from(archived.0.0)
