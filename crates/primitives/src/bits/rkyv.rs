@@ -14,6 +14,18 @@ impl Debug for ArchivedAddress {
     }
 }
 
+impl From<ArchivedBloom> for Bloom {
+    fn from(archived: ArchivedBloom) -> Self {
+        Bloom::from(archived.0.0)
+    }
+}
+
+impl Debug for ArchivedBloom {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        Debug::fmt(&Bloom::from(self.0.0), f)
+    }
+}
+
 impl<const N: usize> From<ArchivedFixedBytes<N>> for FixedBytes<N> {
     fn from(archived: ArchivedFixedBytes<N>) -> Self {
         FixedBytes(archived.0)
