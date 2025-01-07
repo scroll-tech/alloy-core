@@ -80,6 +80,10 @@ cfg_if! {
     }
 }
 
+#[cfg(feature = "map-foldhash")]
+#[doc(no_inline)]
+pub use foldhash;
+
 // Default hasher.
 cfg_if! {
     if #[cfg(feature = "map-foldhash")] {
@@ -118,12 +122,37 @@ cfg_if! {
     }
 }
 
+/// This module contains the rayon parallel iterator types for hash maps (HashMap<K, V>).
+///
+/// You will rarely need to interact with it directly unless you have need to name one
+/// of the iterator types.
+#[cfg(feature = "rayon")]
+pub mod rayon {
+    use super::*;
+
+    cfg_if! {
+        if #[cfg(any(feature = "map-hashbrown", not(feature = "std")))] {
+            pub use hashbrown::hash_map::rayon::{
+                IntoParIter as IntoIter,
+                ParDrain as Drain,
+                ParIter as Iter,
+                ParIterMut as IterMut,
+                ParKeys as Keys,
+                ParValues as Values,
+                ParValuesMut as ValuesMut
+            };
+            use ::rayon as _;
+        } else {
+            pub use ::rayon::collections::hash_map::*;
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    #[cfg_attr(miri, ignore = "foldhash queries time (orlp/foldhash#4)")]
     fn default_hasher_builder_traits() {
         let hash_builder = <DefaultHashBuilder as Default>::default();
         let _hash_builder2 = <DefaultHashBuilder as Clone>::clone(&hash_builder);

@@ -64,10 +64,79 @@ sol! {
     }
 }
 
+/// Docs
+#[deny(missing_docs)]
+pub mod no_missing_docs {
+    alloy_core::sol! {
+        #[allow(missing_docs)]
+        contract Allowed {
+            uint256 public number;
+
+            struct MyStruct {
+                uint256 a;
+                bool b;
+            }
+
+            function setNumber(uint256 newNumber) public {
+                number = newNumber;
+            }
+
+            function increment() public {
+                number++;
+            }
+
+            event Transfer(address indexed from, address indexed to, uint256 value);
+            event Approval(address indexed owner, address indexed spender, uint256 value);
+
+            error Transfer2(address from, address to, uint256 value);
+            error Approval2(address owner, address spender, uint256 value);
+        }
+
+        /// Docs
+        contract NotAllowed {
+            /// Docs
+            uint256 public number;
+
+            /// Docs
+            struct MyStruct {
+                /// Docs
+                uint256 a;
+                /// Docs
+                bool b;
+            }
+
+            /// Docs
+            function setNumber(uint256 newNumber) public {
+                number = newNumber;
+            }
+
+            /// Docs
+            function increment() public {
+                number++;
+            }
+
+            /// Docs
+            event Transfer(address indexed from, address indexed to, uint256 value);
+            /// Docs
+            event Approval(address indexed owner, address indexed spender, uint256 value);
+
+            /// Docs
+            error Transfer2(address from, address to, uint256 value);
+            /// Docs
+            error Approval2(address owner, address spender, uint256 value);
+        }
+    }
+}
+
 #[test]
-#[cfg_attr(miri, ignore = "foldhash queries time (orlp/foldhash#4)")]
 fn do_stuff() {
-    let mut set = alloy_core::primitives::map::HashSet::<MyStruct>::default();
-    set.insert(Default::default());
+    let mut set = alloy_core::primitives::map::B256Map::<MyStruct>::default();
+    set.insert(
+        alloy_core::primitives::hex_literal::hex!(
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+        )
+        .into(),
+        Default::default(),
+    );
     assert_eq!(set.len(), 1);
 }
