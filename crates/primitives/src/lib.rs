@@ -63,6 +63,7 @@ pub use signature::{Parity, Signature};
 pub mod utils;
 pub use utils::{eip191_hash_message, keccak256, Keccak256};
 
+#[doc(hidden)] // Use `hex` directly instead!
 pub mod hex_literal;
 
 #[doc(no_inline)]
