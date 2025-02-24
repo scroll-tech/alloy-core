@@ -201,6 +201,25 @@ impl PrimitiveSignature {
         &self,
         prehash: &crate::B256,
     ) -> Result<crate::Address, SignatureError> {
+        #[cfg(target_os = "zkvm")]
+        {
+            let this = self.normalize_s().unwrap_or(*self);
+            use openvm_ecc_guest::{algebra::IntMod, ecdsa::VerifyingKey, weierstrass::WeierstrassPoint};
+            use openvm_keccak256_guest::keccak256;
+            // FIXME: handle panic
+            let recovered_key = VerifyingKey::<k256::Secp256k1>::recover_from_prehash_noverify(
+                prehash.as_slice(),
+                &this.as_bytes()[..64],
+                this.recid(),
+            );
+            let public_key = recovered_key.as_affine();
+            let mut encoded = [0u8; 64];
+            encoded[..32].copy_from_slice(&public_key.x().to_be_bytes());
+            encoded[32..].copy_from_slice(&public_key.y().to_be_bytes());
+            let hash = keccak256(&encoded);
+            return Ok(crate::Address::from_slice(&hash[12..]));
+        }
+        #[cfg(not(target_os = "zkvm"))]
         self.recover_from_prehash(prehash).map(|vk| crate::Address::from_public_key(&vk))
     }
 
