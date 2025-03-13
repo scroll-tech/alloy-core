@@ -201,7 +201,7 @@ impl PrimitiveSignature {
         &self,
         prehash: &crate::B256,
     ) -> Result<crate::Address, SignatureError> {
-        #[cfg(target_os = "zkvm")]
+        #[cfg(all(target_os = "zkvm", feature = "openvm"))]
         {
             let this = self.normalize_s().unwrap_or(*self);
             use openvm_ecc_guest::{algebra::IntMod, ecdsa::VerifyingKey, weierstrass::WeierstrassPoint};
@@ -219,7 +219,7 @@ impl PrimitiveSignature {
             let hash = keccak256(&encoded);
             return Ok(crate::Address::from_slice(&hash[12..]));
         }
-        #[cfg(not(target_os = "zkvm"))]
+        #[cfg(not(all(target_os = "zkvm", feature = "openvm")))]
         self.recover_from_prehash(prehash).map(|vk| crate::Address::from_public_key(&vk))
     }
 

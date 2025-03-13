@@ -21,8 +21,8 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-openvm-ecc-guest = { git = "https://github.com/openvm-org/openvm.git", rev = "6169765", default-features = false, features = ["k256","p256"]}
-openvm-keccak256-guest = { git = "https://github.com/openvm-org/openvm.git", rev = "6169765", default-features = false }
+openvm-ecc-guest = { git = "https://github.com/openvm-org/openvm.git", rev = "6169765", default-features = false, optional = true }
+openvm-keccak256-guest = { git = "https://github.com/openvm-org/openvm.git", rev = "6169765", default-features = false, optional = true }
 bytes.workspace = true
 hex.workspace = true
 itoa.workspace = true
@@ -168,6 +168,13 @@ postgres = ["std", "dep:postgres-types", "ruint/postgres"]
 # `const-hex` compatibility feature for `hex`.
 # Should not be needed most of the time.
 hex-compat = ["hex/hex"]
+
+openvm = [
+    "dep:openvm-ecc-guest",
+    "dep:openvm-keccak256-guest",
+    "openvm-ecc-guest/k256",
+    "openvm-ecc-guest/p256",
+]
 
 [[bench]]
 name = "primitives"
