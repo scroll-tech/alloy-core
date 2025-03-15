@@ -169,6 +169,13 @@ postgres = ["std", "dep:postgres-types", "ruint/postgres"]
 # Should not be needed most of the time.
 hex-compat = ["hex/hex"]
 
+openvm = [
+    "dep:openvm-ecc-guest",
+    "dep:openvm-keccak256-guest",
+    "openvm-ecc-guest/k256",
+    "openvm-ecc-guest/p256",
+]
+
 [[bench]]
 name = "primitives"
 path = "benches/primitives.rs"
