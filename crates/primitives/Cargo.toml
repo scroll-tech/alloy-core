@@ -21,8 +21,8 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-openvm-ecc-guest = { git = "https://github.com/openvm-org/openvm.git", rev = "de2d3a0", default-features = false, optional = true }
-openvm-keccak256-guest = { git = "https://github.com/openvm-org/openvm.git", rev = "de2d3a0", default-features = false, optional = true }
+openvm-ecc-guest = { git = "https://github.com/openvm-org/openvm.git", rev = "3c35e9f", default-features = false, optional = true }
+openvm-keccak256-guest = { git = "https://github.com/openvm-org/openvm.git", rev = "3c35e9f", default-features = false, optional = true }
 bytes.workspace = true
 hex.workspace = true
 itoa.workspace = true
