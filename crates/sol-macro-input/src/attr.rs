@@ -1,7 +1,10 @@
 use heck::{ToKebabCase, ToLowerCamelCase, ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{punctuated::Punctuated, Attribute, Error, LitBool, LitStr, Path, Result, Token};
+use syn::{
+    meta::ParseNestedMeta, parse::Parse, punctuated::Punctuated, Attribute, Error, LitBool, LitStr,
+    Path, Result, Token,
+};
 
 const DUPLICATE_ERROR: &str = "duplicate attribute";
 const UNKNOWN_ERROR: &str = "unknown `sol` attribute";
@@ -81,6 +84,8 @@ pub struct SolAttrs {
     pub abi: Option<bool>,
     /// `#[sol(all_derives)]`
     pub all_derives: Option<bool>,
+    /// `#[sol(extra_derives(...))]`
+    pub extra_derives: Option<Vec<Path>>,
     /// `#[sol(extra_methods)]`
     pub extra_methods: Option<bool>,
     /// `#[sol(docs)]`
@@ -150,7 +155,13 @@ impl SolAttrs {
                 let path = || meta.value()?.parse::<Path>();
 
                 // `path = "<str>"`
-                let lit = || meta.value()?.parse::<LitStr>();
+                let lit = || {
+                    let value = meta.value()?;
+                    let span = value.span();
+                    let macro_string::MacroString(value) =
+                        value.parse::<macro_string::MacroString>()?;
+                    Ok::<_, syn::Error>(LitStr::new(&value, span))
+                };
 
                 // `path = "0x<hex>"`
                 let bytes = || {
@@ -162,10 +173,21 @@ impl SolAttrs {
                     Ok(lit)
                 };
 
+                // `path(comma, separated, list)`
+                fn list<T>(
+                    meta: &ParseNestedMeta<'_>,
+                    parser: fn(syn::parse::ParseStream<'_>) -> Result<T>,
+                ) -> Result<Vec<T>> {
+                    let content;
+                    syn::parenthesized!(content in meta.input);
+                    Ok(content.parse_terminated(parser, Token![,])?.into_iter().collect())
+                }
+
                 match_! {
                     rpc => bool()?,
                     abi => bool()?,
                     all_derives => bool()?,
+                    extra_derives => list(&meta, Path::parse)?,
                     extra_methods => bool()?,
                     docs => bool()?,
 
@@ -311,8 +333,9 @@ mod tests {
     use syn::parse_quote;
 
     macro_rules! test_sol_attrs {
-        ($($group:ident { $($t:tt)* })+) => {$(
+        ($($(#[$attr:meta])* $group:ident { $($t:tt)* })+) => {$(
             #[test]
+            $(#[$attr])*
             fn $group() {
                 test_sol_attrs! { $($t)* }
             }
@@ -386,6 +409,11 @@ mod tests {
             #[sol(all_derives = "false")] => Err("expected boolean literal"),
             #[sol(all_derives)] #[sol(all_derives)] => Err(DUPLICATE_ERROR),
 
+            #[sol(extra_derives(Single, module::Double))] => Ok(sol_attrs! { extra_derives: vec![
+                parse_quote!(Single),
+                parse_quote!(module::Double),
+            ] }),
+
             #[sol(extra_methods)] => Ok(sol_attrs! { extra_methods: true }),
             #[sol(extra_methods = true)] => Ok(sol_attrs! { extra_methods: true }),
             #[sol(extra_methods = false)] => Ok(sol_attrs! { extra_methods: false }),
@@ -434,6 +462,11 @@ mod tests {
         type_check {
             #[sol(type_check = "my_function")] => Ok(sol_attrs! { type_check: parse_quote!("my_function") }),
             #[sol(type_check = "my_function1")] #[sol(type_check = "my_function2")] => Err(DUPLICATE_ERROR),
+        }
+
+        #[cfg_attr(miri, ignore = "env not available")]
+        inner_macro {
+            #[sol(rename = env!("CARGO_PKG_NAME"))] => Ok(sol_attrs! { rename: parse_quote!("alloy-sol-macro-input") }),
         }
     }
 }

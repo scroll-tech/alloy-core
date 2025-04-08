@@ -4,6 +4,10 @@
 /// This functionally creates a new named `FixedBytes` that cannot be
 /// type-confused for another named `FixedBytes`.
 ///
+/// **NOTE:** This macro currently requires:
+/// - `#![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]` at the top level of the crate.
+/// - The `derive_more` crate in scope.
+///
 /// # Examples
 ///
 /// ```
@@ -426,13 +430,11 @@ macro_rules! impl_fb_traits {
 #[cfg(feature = "getrandom")]
 macro_rules! impl_getrandom {
     () => {
-        /// Instantiates a new fixed byte array with cryptographically random
-        /// content.
+        /// Creates a new fixed byte array with the default cryptographic random number
+        /// generator.
         ///
-        /// # Panics
-        ///
-        /// Panics if the underlying call to `getrandom_uninit`
-        /// fails.
+        /// This is `rand::thread_rng` if the "rand" and "std" features are enabled, otherwise
+        /// it uses `getrandom::getrandom`. Both are cryptographically secure.
         #[inline]
         #[track_caller]
         #[cfg_attr(docsrs, doc(cfg(feature = "getrandom")))]
@@ -440,37 +442,30 @@ macro_rules! impl_getrandom {
             Self($crate::FixedBytes::random())
         }
 
-        /// Tries to create a new fixed byte array with cryptographically random
-        /// content.
+        /// Tries to create a new fixed byte array with the default cryptographic random number
+        /// generator.
         ///
-        /// # Errors
-        ///
-        /// This function only propagates the error from the underlying call to
-        /// `getrandom_uninit`.
+        /// See [`random`](Self::random) for more details.
         #[inline]
         #[cfg_attr(docsrs, doc(cfg(feature = "getrandom")))]
         pub fn try_random() -> $crate::private::Result<Self, $crate::private::getrandom::Error> {
             $crate::FixedBytes::try_random().map(Self)
         }
 
-        /// Fills this fixed byte array with cryptographically random content.
+        /// Fills this fixed byte array with the default cryptographic random number generator.
         ///
-        /// # Panics
-        ///
-        /// Panics if the underlying call to `getrandom_uninit` fails.
+        /// See [`random`](Self::random) for more details.
         #[inline]
         #[track_caller]
         #[cfg_attr(docsrs, doc(cfg(feature = "getrandom")))]
         pub fn randomize(&mut self) {
-            self.try_randomize().unwrap()
+            self.0.randomize();
         }
 
-        /// Tries to fill this fixed byte array with cryptographically random content.
+        /// Tries to fill this fixed byte array with the default cryptographic random number
+        /// generator.
         ///
-        /// # Errors
-        ///
-        /// This function only propagates the error from the underlying call to
-        /// `getrandom_uninit`.
+        /// See [`random`](Self::random) for more details.
         #[inline]
         #[cfg_attr(docsrs, doc(cfg(feature = "getrandom")))]
         pub fn try_randomize(
@@ -497,23 +492,42 @@ macro_rules! impl_rand {
         #[inline]
         #[doc(alias = "random_using")]
         #[cfg_attr(docsrs, doc(cfg(feature = "rand")))]
-        pub fn random_with<R: $crate::private::rand::Rng + ?Sized>(rng: &mut R) -> Self {
+        pub fn random_with<R: $crate::private::rand::RngCore + ?Sized>(rng: &mut R) -> Self {
             Self($crate::FixedBytes::random_with(rng))
+        }
+
+        /// Tries to create a new fixed byte array with the given random number generator.
+        #[inline]
+        #[cfg_attr(docsrs, doc(cfg(feature = "rand")))]
+        pub fn try_random_with<R: $crate::private::rand::TryRngCore + ?Sized>(
+            rng: &mut R,
+        ) -> $crate::private::Result<Self, R::Error> {
+            $crate::FixedBytes::try_random_with(rng).map(Self)
         }
 
         /// Fills this fixed byte array with the given random number generator.
         #[inline]
         #[doc(alias = "randomize_using")]
         #[cfg_attr(docsrs, doc(cfg(feature = "rand")))]
-        pub fn randomize_with<R: $crate::private::rand::Rng + ?Sized>(&mut self, rng: &mut R) {
+        pub fn randomize_with<R: $crate::private::rand::RngCore + ?Sized>(&mut self, rng: &mut R) {
             self.0.randomize_with(rng);
+        }
+
+        /// Tries to fill this fixed byte array with the given random number generator.
+        #[inline]
+        #[cfg_attr(docsrs, doc(cfg(feature = "rand")))]
+        pub fn try_randomize_with<R: $crate::private::rand::TryRngCore + ?Sized>(
+            &mut self,
+            rng: &mut R,
+        ) -> $crate::private::Result<(), R::Error> {
+            self.0.try_randomize_with(rng)
         }
     };
 
     ($t:ty) => {
         #[cfg_attr(docsrs, doc(cfg(feature = "rand")))]
-        impl $crate::private::rand::distributions::Distribution<$t>
-            for $crate::private::rand::distributions::Standard
+        impl $crate::private::rand::distr::Distribution<$t>
+            for $crate::private::rand::distr::StandardUniform
         {
             #[inline]
             fn sample<R: $crate::private::rand::Rng + ?Sized>(&self, rng: &mut R) -> $t {
@@ -551,7 +565,7 @@ macro_rules! impl_rlp {
             }
 
             #[inline]
-            fn encode(&self, out: &mut dyn bytes::BufMut) {
+            fn encode(&self, out: &mut dyn $crate::private::alloy_rlp::BufMut) {
                 $crate::private::alloy_rlp::Encodable::encode(&self.0, out)
             }
         }
@@ -599,7 +613,10 @@ macro_rules! impl_serde {
         #[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
         impl $crate::private::serde::Serialize for $t {
             #[inline]
-            fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+            fn serialize<S: $crate::private::serde::Serializer>(
+                &self,
+                serializer: S,
+            ) -> Result<S::Ok, S::Error> {
                 $crate::private::serde::Serialize::serialize(&self.0, serializer)
             }
         }

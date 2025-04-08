@@ -15,7 +15,11 @@ exclude.workspace = true
 
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
+rustdoc-args = [
+    "-Zunstable-options",
+    "--generate-link-to-definition",
+    "--show-type-layout",
+]
 
 [lints]
 workspace = true
@@ -66,7 +70,7 @@ rkyv = { workspace = true, optional = true }
 getrandom = { workspace = true, optional = true }
 
 # rand
-rand = { workspace = true, optional = true, features = ["getrandom"] }
+rand = { workspace = true, optional = true }
 
 # rayon
 rayon = { workspace = true, optional = true }
@@ -114,6 +118,7 @@ std = [
     "keccak-asm?/std",
     "proptest?/std",
     "rand?/std",
+    "rand?/thread_rng",
     "rustc-hash?/std",
     "serde?/std",
     "sha3?/std",
@@ -138,7 +143,7 @@ map-fxhash = ["map", "dep:rustc-hash"]
 
 getrandom = ["dep:getrandom"]
 k256 = ["dep:k256"]
-rand = ["dep:rand", "getrandom", "ruint/rand", "rustc-hash?/rand"]
+rand = ["dep:rand", "getrandom", "ruint/rand-09", "rustc-hash?/rand"]
 rayon = ["dep:rayon", "hashbrown?/rayon", "indexmap?/rayon"]
 rkyv = ["dep:rkyv", "ruint/rkyv"]
 rlp = ["dep:alloy-rlp", "ruint/alloy-rlp"]

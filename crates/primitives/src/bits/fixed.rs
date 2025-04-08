@@ -324,9 +324,7 @@ impl<const N: usize> str::FromStr for FixedBytes<N> {
 }
 
 #[cfg(feature = "rand")]
-impl<const N: usize> rand::distributions::Distribution<FixedBytes<N>>
-    for rand::distributions::Standard
-{
+impl<const N: usize> rand::distr::Distribution<FixedBytes<N>> for rand::distr::StandardUniform {
     #[inline]
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> FixedBytes<N> {
         FixedBytes::random_with(rng)
@@ -365,26 +363,23 @@ impl<const N: usize> FixedBytes<N> {
         N
     }
 
-    /// Creates a new [`FixedBytes`] with cryptographically random content.
+    /// Creates a new [`FixedBytes`] with the default cryptographic random number generator.
     ///
-    /// # Panics
-    ///
-    /// Panics if the underlying call to
-    /// [`getrandom_uninit`](getrandom::getrandom_uninit) fails.
+    /// This is `rand::thread_rng` if the "rand" and "std" features are enabled, otherwise
+    /// it uses `getrandom::getrandom`. Both are cryptographically secure.
     #[cfg(feature = "getrandom")]
     #[inline]
     #[track_caller]
     pub fn random() -> Self {
-        Self::try_random().unwrap()
+        let mut bytes = Self::ZERO;
+        bytes.randomize();
+        bytes
     }
 
-    /// Tries to create a new [`FixedBytes`] with cryptographically random
-    /// content.
+    /// Tries to create a new [`FixedBytes`] with the default cryptographic random number
+    /// generator.
     ///
-    /// # Errors
-    ///
-    /// This function only propagates the error from the underlying call to
-    /// [`getrandom_uninit`](getrandom::getrandom_uninit).
+    /// See [`random`](Self::random) for more details.
     #[cfg(feature = "getrandom")]
     #[inline]
     pub fn try_random() -> Result<Self, getrandom::Error> {
@@ -394,45 +389,70 @@ impl<const N: usize> FixedBytes<N> {
     }
 
     /// Creates a new [`FixedBytes`] with the given random number generator.
+    ///
+    /// See [`random`](Self::random) for more details.
     #[cfg(feature = "rand")]
     #[inline]
     #[doc(alias = "random_using")]
-    pub fn random_with<R: rand::Rng + ?Sized>(rng: &mut R) -> Self {
+    pub fn random_with<R: rand::RngCore + ?Sized>(rng: &mut R) -> Self {
         let mut bytes = Self::ZERO;
         bytes.randomize_with(rng);
         bytes
     }
 
-    /// Fills this [`FixedBytes`] with cryptographically random content.
+    /// Tries to create a new [`FixedBytes`] with the given random number generator.
+    #[cfg(feature = "rand")]
+    #[inline]
+    pub fn try_random_with<R: rand::TryRngCore + ?Sized>(rng: &mut R) -> Result<Self, R::Error> {
+        let mut bytes = Self::ZERO;
+        bytes.try_randomize_with(rng)?;
+        Ok(bytes)
+    }
+
+    /// Fills this [`FixedBytes`] with the default cryptographic random number generator.
     ///
-    /// # Panics
-    ///
-    /// Panics if the underlying call to
-    /// [`getrandom_uninit`](getrandom::getrandom_uninit) fails.
+    /// See [`random`](Self::random) for more details.
     #[cfg(feature = "getrandom")]
     #[inline]
     #[track_caller]
     pub fn randomize(&mut self) {
-        self.try_randomize().unwrap()
+        self.try_randomize().unwrap_or_else(|e| panic!("failed to fill with random bytes: {e}"));
     }
 
-    /// Tries to fill this [`FixedBytes`] with cryptographically random content.
+    /// Tries to fill this [`FixedBytes`] with the default cryptographic random number
+    /// generator.
     ///
-    /// # Errors
-    ///
-    /// This function only propagates the error from the underlying call to
-    /// [`getrandom_uninit`](getrandom::getrandom_uninit).
+    /// See [`random`](Self::random) for more details.
     #[inline]
     #[cfg(feature = "getrandom")]
     pub fn try_randomize(&mut self) -> Result<(), getrandom::Error> {
-        getrandom::getrandom(&mut self.0)
+        #[cfg(all(feature = "rand", feature = "std"))]
+        {
+            self.randomize_with(&mut rand::rng());
+            Ok(())
+        }
+        #[cfg(not(all(feature = "rand", feature = "std")))]
+        {
+            getrandom::fill(&mut self.0)
+        }
     }
 
     /// Fills this [`FixedBytes`] with the given random number generator.
     #[cfg(feature = "rand")]
+    #[inline]
     #[doc(alias = "randomize_using")]
-    pub fn randomize_with<R: rand::Rng + ?Sized>(&mut self, rng: &mut R) {
+    pub fn randomize_with<R: rand::RngCore + ?Sized>(&mut self, rng: &mut R) {
         rng.fill_bytes(&mut self.0);
+    }
+
+    /// Tries to fill this [`FixedBytes`] with the given random number generator.
+    #[inline]
+    #[cfg(feature = "rand")]
+    pub fn try_randomize_with<R: rand::TryRngCore + ?Sized>(
+        &mut self,
+        rng: &mut R,
+    ) -> Result<(), R::Error> {
+        rng.try_fill_bytes(&mut self.0)
     }
 
     /// Concatenate two `FixedBytes`.
@@ -623,9 +643,9 @@ mod tests {
 
     #[test]
     fn concat_const() {
-        const A: FixedBytes<2> = fixed_bytes!("0123");
-        const B: FixedBytes<2> = fixed_bytes!("4567");
-        const EXPECTED: FixedBytes<4> = fixed_bytes!("01234567");
+        const A: FixedBytes<2> = fixed_bytes!("0x0123");
+        const B: FixedBytes<2> = fixed_bytes!("0x4567");
+        const EXPECTED: FixedBytes<4> = fixed_bytes!("0x01234567");
         const ACTUAL: FixedBytes<4> = A.concat_const(B);
 
         assert_eq!(ACTUAL, EXPECTED);
@@ -667,11 +687,11 @@ mod tests {
 
     #[test]
     fn left_padding_from() {
-        assert_eq!(FixedBytes::<4>::left_padding_from(&[0x01, 0x23]), fixed_bytes!("00000123"));
+        assert_eq!(FixedBytes::<4>::left_padding_from(&[0x01, 0x23]), fixed_bytes!("0x00000123"));
 
         assert_eq!(
             FixedBytes::<4>::left_padding_from(&[0x01, 0x23, 0x45, 0x67]),
-            fixed_bytes!("01234567")
+            fixed_bytes!("0x01234567")
         );
     }
 
@@ -683,11 +703,11 @@ mod tests {
 
     #[test]
     fn right_padding_from() {
-        assert_eq!(FixedBytes::<4>::right_padding_from(&[0x01, 0x23]), fixed_bytes!("01230000"));
+        assert_eq!(FixedBytes::<4>::right_padding_from(&[0x01, 0x23]), fixed_bytes!("0x01230000"));
 
         assert_eq!(
             FixedBytes::<4>::right_padding_from(&[0x01, 0x23, 0x45, 0x67]),
-            fixed_bytes!("01234567")
+            fixed_bytes!("0x01234567")
         );
     }
 

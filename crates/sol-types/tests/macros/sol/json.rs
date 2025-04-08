@@ -10,7 +10,7 @@ fn large_array() {
         #[sol(abi)]
         #[derive(Debug)]
         LargeArray,
-        "../json-abi/tests/abi/LargeArray.json"
+        concat!(env!("CARGO_MANIFEST_DIR"), "/../json-abi/tests/abi/LargeArray.json")
     );
 
     let call = LargeArray::callWithLongArrayCall { longArray: [0; 128] };
@@ -47,14 +47,26 @@ fn large_array() {
 
 #[test]
 fn seaport() {
-    sol!(Seaport, "../json-abi/tests/abi/Seaport.json");
+    sol!(
+        #[derive(Debug, PartialEq, Eq)]
+        Seaport,
+        "../json-abi/tests/abi/Seaport.json"
+    );
     use Seaport::*;
 
     // Constructor with a single argument
     let _ = constructorCall { conduitController: Address::ZERO };
 
     // BasicOrderType is a uint8 UDVT
-    let _ = BasicOrderType::from(0u8);
+    let o1 = BasicOrderType::from(0u8);
+    let o2: BasicOrderType = 0.into();
+
+    assert_eq!(o1, o2);
+
+    let o1_inner: u8 = o1.into();
+    let o2_inner: u8 = o2.into();
+
+    assert_eq!(o1_inner, o2_inner);
 
     // BasicOrderParameters is a struct that contains UDVTs (basicOrderType) and a
     // struct array. The only component should be the struct of the struct array.
@@ -239,3 +251,14 @@ fn balancer_v2_vault() {
 // fn smartsession_bootstrap() {
 //     sol!(Bootstrap, "../json-abi/tests/abi/Bootstrap.json");
 // }
+
+#[test]
+fn inner_macros() {
+    sol!(
+        #[sol(all_derives)]
+        Name,
+        concat!("[", "]"),
+    );
+    #[allow(unused_imports)]
+    use Name::*;
+}

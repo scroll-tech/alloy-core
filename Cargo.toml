@@ -3,7 +3,7 @@ members = ["crates/*", "tests/*"]
 resolver = "2"
 
 [workspace.package]
-version = "0.8.18"
+version = "0.8.25"
 edition = "2021"
 rust-version = "1.81"
 authors = ["Alloy Contributors"]
@@ -12,17 +12,13 @@ homepage = "https://github.com/alloy-rs/core"
 repository = "https://github.com/alloy-rs/core"
 exclude = ["tests"]
 
-[workspace.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
-
 [workspace.lints.clippy]
 dbg-macro = "warn"
 manual-string-new = "warn"
 uninlined-format-args = "warn"
 use-self = "warn"
 redundant-clone = "warn"
-missing-const-for-fn = "warn"
+missing-const-for-fn = "allow" # TODO: https://github.com/rust-lang/rust-clippy/issues/14020
 
 [workspace.lints.rust]
 missing-copy-implementations = "warn"
@@ -39,16 +35,16 @@ all = "warn"
 
 [workspace.dependencies]
 # workspace crates
-alloy-core = { version = "0.8.18", path = "crates/core", default-features = false }
-alloy-dyn-abi = { version = "0.8.18", path = "crates/dyn-abi", default-features = false }
-alloy-json-abi = { version = "0.8.18", path = "crates/json-abi", default-features = false }
-alloy-primitives = { version = "0.8.18", path = "crates/primitives", default-features = false }
-alloy-sol-macro = { version = "0.8.18", path = "crates/sol-macro", default-features = false }
-alloy-sol-macro-input = { version = "0.8.18", path = "crates/sol-macro-input", default-features = false }
-alloy-sol-macro-expander = { version = "0.8.18", path = "crates/sol-macro-expander", default-features = false }
-alloy-sol-type-parser = { version = "0.8.18", path = "crates/sol-type-parser", default-features = false }
-alloy-sol-types = { version = "0.8.18", path = "crates/sol-types", default-features = false }
-syn-solidity = { version = "0.8.18", path = "crates/syn-solidity", default-features = false }
+alloy-core = { version = "0.8.25", path = "crates/core", default-features = false }
+alloy-dyn-abi = { version = "0.8.25", path = "crates/dyn-abi", default-features = false }
+alloy-json-abi = { version = "0.8.25", path = "crates/json-abi", default-features = false }
+alloy-primitives = { version = "0.8.25", path = "crates/primitives", default-features = false }
+alloy-sol-macro = { version = "0.8.25", path = "crates/sol-macro", default-features = false }
+alloy-sol-macro-input = { version = "0.8.25", path = "crates/sol-macro-input", default-features = false }
+alloy-sol-macro-expander = { version = "0.8.25", path = "crates/sol-macro-expander", default-features = false }
+alloy-sol-type-parser = { version = "0.8.25", path = "crates/sol-type-parser", default-features = false }
+alloy-sol-types = { version = "0.8.25", path = "crates/sol-types", default-features = false }
+syn-solidity = { version = "0.8.25", path = "crates/syn-solidity", default-features = false }
 
 # serde
 serde = { version = "1.0", default-features = false, features = ["alloc"] }
@@ -58,13 +54,13 @@ serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 rkyv = "0.8"
 
 # macros
-proc-macro-error2 = "2.0.0"
+proc-macro-error2 = ">=2.0.0, <=2.0.1" # We directly use the `entry_point` private API.
 proc-macro2 = "1.0"
 quote = "1.0"
 syn = "2.0"
 
 cfg-if = "1.0.0"
-derive_more = { version = "1.0", default-features = false }
+derive_more = { version = "2.0", default-features = false }
 paste = "1.0"
 
 # crypto
@@ -91,7 +87,7 @@ bincode = "1.3"
 bytes = { version = "1", default-features = false }
 criterion = "0.5"
 derive_arbitrary = "1.3"
-getrandom = "0.2"
+getrandom = "0.3"
 hex = { package = "const-hex", version = "1.14", default-features = false, features = [
     "alloc",
     "core-error",
@@ -102,11 +98,11 @@ postgres-types = "0.2.6"
 pretty_assertions = "1.4"
 proptest = "1"
 proptest-derive = "0.5"
-rand = { version = "0.8", default-features = false }
+rand = { version = "0.9", default-features = false, features = ["os_rng"] }
 rayon = { version = "1.2", default-features = false }
-ruint = { version = "1.12.3", default-features = false, features = ["alloc"] }
+ruint = { version = "1.14.0", default-features = false, features = ["alloc"] }
 ruint-macro = { version = "1", default-features = false }
-winnow = { version = "0.6", default-features = false, features = ["alloc"] }
+winnow = { version = "0.7", default-features = false, features = ["alloc"] }
 
 [patch.crates-io]
-ruint = { git = "https://github.com/scroll-tech/uint.git", branch = "v1.12.3" }
+ruint = { git = "https://github.com/scroll-tech/uint.git", branch = "v1.14.0" }

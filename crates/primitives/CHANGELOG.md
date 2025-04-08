@@ -5,11 +5,99 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.25](https://github.com/alloy-rs/core/releases/tag/v0.8.25) - 2025-03-26
+
+### Bug Fixes
+
+- [primitives] Remove undefined behavior in FixedBytes ([#919](https://github.com/alloy-rs/core/issues/919))
+- Do not rely on bytes dependency in `wrap_fixed_bytes!` ([#918](https://github.com/alloy-rs/core/issues/918))
+
+### Miscellaneous Tasks
+
+- Add hash_ref function to sealed.rs ([#920](https://github.com/alloy-rs/core/issues/920))
+
+## [0.8.24](https://github.com/alloy-rs/core/releases/tag/v0.8.24) - 2025-03-21
+
+### Miscellaneous Tasks
+
+- Release 0.8.24
+- Restore clippy allow
+
+### Other
+
+- Make PrimitiveSignature::new a const fn ([#913](https://github.com/alloy-rs/core/issues/913))
+
+## [0.8.23](https://github.com/alloy-rs/core/releases/tag/v0.8.23) - 2025-03-13
+
+### Features
+
+- [`primitives`] Impl Display for PrimitiveSig ([#892](https://github.com/alloy-rs/core/issues/892))
+
+### Miscellaneous Tasks
+
+- Release 0.8.23
+- Clippy ([#894](https://github.com/alloy-rs/core/issues/894))
+- [primitives] Make TxKind::into_to const ([#890](https://github.com/alloy-rs/core/issues/890))
+
+## [0.8.22](https://github.com/alloy-rs/core/releases/tag/v0.8.22) - 2025-02-27
+
+### Documentation
+
+- [primitives] Report some Bytes methods may panic ([#877](https://github.com/alloy-rs/core/issues/877))
+- [primitives] `random` functions are cryptographically secure ([#872](https://github.com/alloy-rs/core/issues/872))
+
+### Features
+
+- [primitives] Add some more utility methods to PrimitiveSignature ([#888](https://github.com/alloy-rs/core/issues/888))
+- Erc2098 signature representation ([#874](https://github.com/alloy-rs/core/issues/874))
+- Add TxKind::into_to ([#875](https://github.com/alloy-rs/core/issues/875))
+- [primitives] Improve rand implementations, use `thread_rng` when available ([#870](https://github.com/alloy-rs/core/issues/870))
+
+### Miscellaneous Tasks
+
+- Release 0.8.22
+
+## [0.8.21](https://github.com/alloy-rs/core/releases/tag/v0.8.21) - 2025-02-10
+
+### Miscellaneous Tasks
+
+- Release 0.8.21
+
+## [0.8.20](https://github.com/alloy-rs/core/releases/tag/v0.8.20) - 2025-02-02
+
+### Documentation
+
+- Add 0x to alloy-primitives readme example ([#861](https://github.com/alloy-rs/core/issues/861))
+
+### Features
+
+- Add Sealed::as_sealed_ref ([#859](https://github.com/alloy-rs/core/issues/859))
+- Add Sealed::cloned ([#860](https://github.com/alloy-rs/core/issues/860))
+
+### Miscellaneous Tasks
+
+- Release 0.8.20
+
+## [0.8.19](https://github.com/alloy-rs/core/releases/tag/v0.8.19) - 2025-01-15
+
+### Documentation
+
+- Enable some useful rustdoc features on docs.rs ([#850](https://github.com/alloy-rs/core/issues/850))
+- Hide hex_literal export ([#849](https://github.com/alloy-rs/core/issues/849))
+
+### Miscellaneous Tasks
+
+- Release 0.8.19
+
 ## [0.8.18](https://github.com/alloy-rs/core/releases/tag/v0.8.18) - 2025-01-04
 
 ### Bug Fixes
 
 - [primitives] Hex macro re-export ([#848](https://github.com/alloy-rs/core/issues/848))
+
+### Miscellaneous Tasks
+
+- Release 0.8.18
 
 ## [0.8.17](https://github.com/alloy-rs/core/releases/tag/v0.8.17) - 2025-01-04
 

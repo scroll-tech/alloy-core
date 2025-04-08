@@ -34,7 +34,7 @@ pub use bits::{
     BLOOM_BITS_PER_ITEM, BLOOM_SIZE_BITS, BLOOM_SIZE_BYTES,
 };
 #[cfg(feature = "rkyv")]
-pub use bits::{ArchivedAddress, ArchivedFixedBytes, AddressResolver, FixedBytesResolver};
+pub use bits::{ArchivedAddress, ArchivedFixedBytes, AddressResolver, FixedBytesResolver, ArchivedBloom, BloomResolver};
 
 #[path = "bytes/mod.rs"]
 mod bytes_;
@@ -56,13 +56,14 @@ mod signed;
 pub use signed::{BigIntConversionError, ParseSignedError, Sign, Signed};
 
 mod signature;
-pub use signature::{normalize_v, to_eip155_v, PrimitiveSignature, SignatureError};
 #[allow(deprecated)]
-pub use signature::{Parity, Signature};
+pub use signature::PrimitiveSignature;
+pub use signature::{normalize_v, to_eip155_v, Signature, SignatureError};
 
 pub mod utils;
 pub use utils::{eip191_hash_message, keccak256, Keccak256};
 
+#[doc(hidden)] // Use `hex` directly instead!
 pub mod hex_literal;
 
 #[doc(no_inline)]
