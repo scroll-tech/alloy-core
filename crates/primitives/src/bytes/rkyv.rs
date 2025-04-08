@@ -2,13 +2,12 @@ use crate::Bytes;
 use bytes::BytesMut;
 use rkyv::{
     bytecheck::CheckBytes,
-    rancor::Fallible,
+    rancor::{Fallible, Source, Trace},
     ser::{Allocator, Writer},
+    validation::ArchiveContext,
     vec::{ArchivedVec, VecResolver},
     Archive, Deserialize, Place, Serialize,
 };
-use rkyv::rancor::{Source, Trace};
-use rkyv::validation::ArchiveContext;
 
 impl Archive for Bytes {
     type Archived = ArchivedVec<u8>;
@@ -36,8 +35,9 @@ impl<D: Fallible + ?Sized> Deserialize<Bytes, D> for ArchivedVec<u8> {
     }
 }
 
-unsafe impl<C: Fallible+ ArchiveContext + Sized> CheckBytes<C> for Bytes
-where <C as Fallible>::Error: Source + Trace,
+unsafe impl<C: Fallible + ArchiveContext + Sized> CheckBytes<C> for Bytes
+where
+    <C as Fallible>::Error: Source + Trace,
 {
     unsafe fn check_bytes(value: *const Self, context: &mut C) -> Result<(), C::Error> {
         ArchivedVec::<u8>::check_bytes(value as *const ArchivedVec<u8>, context)

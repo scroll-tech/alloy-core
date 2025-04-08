@@ -4,12 +4,12 @@ mod macros;
 mod address;
 pub use address::{Address, AddressChecksumBuffer, AddressError};
 #[cfg(feature = "rkyv")]
-pub use address::{ArchivedAddress, AddressResolver};
+pub use address::{AddressResolver, ArchivedAddress};
 
 mod bloom;
-pub use bloom::{Bloom, BloomInput, BLOOM_BITS_PER_ITEM, BLOOM_SIZE_BITS, BLOOM_SIZE_BYTES};
 #[cfg(feature = "rkyv")]
 pub use bloom::{ArchivedBloom, BloomResolver};
+pub use bloom::{Bloom, BloomInput, BLOOM_BITS_PER_ITEM, BLOOM_SIZE_BITS, BLOOM_SIZE_BYTES};
 
 mod fixed;
 pub use fixed::FixedBytes;

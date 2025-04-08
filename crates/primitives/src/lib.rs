@@ -34,7 +34,10 @@ pub use bits::{
     BLOOM_BITS_PER_ITEM, BLOOM_SIZE_BITS, BLOOM_SIZE_BYTES,
 };
 #[cfg(feature = "rkyv")]
-pub use bits::{ArchivedAddress, ArchivedFixedBytes, AddressResolver, FixedBytesResolver, ArchivedBloom, BloomResolver};
+pub use bits::{
+    AddressResolver, ArchivedAddress, ArchivedBloom, ArchivedFixedBytes, BloomResolver,
+    FixedBytesResolver,
+};
 
 #[path = "bytes/mod.rs"]
 mod bytes_;

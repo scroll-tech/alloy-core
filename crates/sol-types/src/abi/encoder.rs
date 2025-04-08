@@ -71,10 +71,7 @@ impl Encoder {
     pub fn into_bytes(self) -> Vec<u8> {
         // BREAKED!! // SAFETY: `#[repr(transparent)] FixedBytes<N>([u8; N])`
         // unsafe { mem::transmute::<Vec<Word>, Vec<[u8; 32]>>(self.finish()) }.into_flattened()
-        self.buf
-            .into_iter()
-            .flat_map(|w| w.0)
-            .collect()
+        self.buf.into_iter().flat_map(|w| w.0).collect()
     }
 
     /// Determine the current suffix offset.
@@ -797,7 +794,7 @@ mod tests {
         let data = vec![hex!(
             "019c80031b20d5e69c8093a571162299032018d913930d93ab320ae5ea44a4218a274f00d607"
         )
-            .to_vec()];
+        .to_vec()];
 
         let expected = hex!(
             "
