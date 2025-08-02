@@ -5,12 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0](https://github.com/alloy-rs/core/releases/tag/v1.3.0) - 2025-07-22
+
+### Bug Fixes
+
+- [sol-types] Overflow in abi decoder ([#982](https://github.com/alloy-rs/core/issues/982))
+
+### Documentation
+
+- Add EIP-712 usage example to README ([#975](https://github.com/alloy-rs/core/issues/975))
+
+### Features
+
+- [primitives] Serialize `Signed` with a compact binary representation ([#953](https://github.com/alloy-rs/core/issues/953))
+- Add native sqlx support for Address (MySQL/Postgres/SQLite) with feature gating and tests ([#970](https://github.com/alloy-rs/core/issues/970))
+- Add `is_dynamic` method to `DynSolType` ([#974](https://github.com/alloy-rs/core/issues/974))
+
+### Miscellaneous Tasks
+
+- Fix warning in generated code ([#976](https://github.com/alloy-rs/core/issues/976))
+- [meta] Update .gitignore
+- Add helper to find function by selector ([#971](https://github.com/alloy-rs/core/issues/971))
+
+## [1.2.1](https://github.com/alloy-rs/core/releases/tag/v1.2.1) - 2025-06-20
+
+### Bug Fixes
+
+- Colon 712 identifiers ([#963](https://github.com/alloy-rs/core/issues/963))
+
+### Dependencies
+
+- [meta] Add edition 2024 bump to .git-blame-ignore-revs
+
+### Miscellaneous Tasks
+
+- Release 1.2.1
+- Re-enable clippy::missing-const-for-fn ([#961](https://github.com/alloy-rs/core/issues/961))
+
 ## [1.2.0](https://github.com/alloy-rs/core/releases/tag/v1.2.0) - 2025-06-04
 
 ### Dependencies
 
 - Bump to edition 2024 ([#960](https://github.com/alloy-rs/core/issues/960))
 - Bump MSRV to 1.85 ([#959](https://github.com/alloy-rs/core/issues/959))
+
+### Miscellaneous Tasks
+
+- Release 1.2.0
 
 ## [1.1.3](https://github.com/alloy-rs/core/releases/tag/v1.1.3) - 2025-06-04
 

@@ -133,7 +133,7 @@ impl<'de> Decoder<'de> {
 
     /// Advance the offset by `len` bytes.
     #[inline]
-    fn increase_offset(&mut self, len: usize) {
+    const fn increase_offset(&mut self, len: usize) {
         self.offset += len;
     }
 
@@ -147,7 +147,8 @@ impl<'de> Decoder<'de> {
     /// advancing the offset.
     #[inline]
     pub fn peek_len_at(&self, offset: usize, len: usize) -> Result<&'de [u8], Error> {
-        self.peek(offset..offset + len)
+        let end = offset.checked_add(len).ok_or(Error::Overrun)?;
+        self.peek(offset..end)
     }
 
     /// Peek a slice of size `len` from the buffer without advancing the offset.
@@ -212,13 +213,13 @@ impl<'de> Decoder<'de> {
     /// Takes the offset from the child decoder and sets it as the current
     /// offset.
     #[inline]
-    pub fn take_offset_from(&mut self, child: &Self) {
+    pub const fn take_offset_from(&mut self, child: &Self) {
         self.set_offset(child.offset + (self.buf.len() - child.buf.len()));
     }
 
     /// Sets the current offset in the buffer.
     #[inline]
-    pub fn set_offset(&mut self, offset: usize) {
+    pub const fn set_offset(&mut self, offset: usize) {
         self.offset = offset;
     }
 
@@ -280,6 +281,7 @@ pub fn decode_sequence<'de, T: TokenSeq<'de>>(data: &'de [u8]) -> Result<T> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::{SolType, SolValue, sol, sol_data, utils::pad_usize};
     use alloc::string::ToString;
     use alloy_primitives::{Address, B256, U256, address, bytes, hex};
@@ -719,5 +721,16 @@ mod tests {
         assert_eq!(ty.abi_encoded_size(), encoded.len());
 
         assert_eq!(<Ty as SolType>::abi_decode(&encoded).unwrap(), ty);
+    }
+
+    #[test]
+    fn offset_overflow() {
+        let encoded = hex!(
+            "0000000000000000000000000000000000000000000000000000000000000020"
+            "000000000000000000000000000000000000000000000000ffffffffffffffff"
+            "0000000000000000000000000000000000000000000000000000000000000000"
+        );
+        let err = <sol_data::String as SolType>::abi_decode(&encoded).unwrap_err();
+        assert_eq!(err, Error::Overrun);
     }
 }
